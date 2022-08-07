@@ -1,0 +1,30 @@
+<launch>	
+	        <!--  ************** Navigation ***************  -->
+	      
+	<include file="$(find nox)/launch/nox_bringup.launch" />
+	<include file="$(find rur_navigation)/launch/amcl.launch"/> 
+	
+	<arg name = "map_file" default="/home/ubuntu/map3.yaml" />	
+	<node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)" respawn="true"/>
+	
+	
+
+	
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  	  	<rosparam file="$(find nox)/cfg/costmap_common_params.yaml" command="load" ns="global_costmap" />
+  	 	<rosparam file="$(find nox)/cfg/costmap_common_params.yaml" command="load" ns="local_costmap" />
+  		<rosparam file="$(find nox)/cfg/local_costmap_params.yaml" command="load" />
+  		<rosparam file="$(find nox)/cfg/global_costmap_params.yaml" command="load" />
+  		<rosparam file="$(find nox)/cfg/dwa_local_planner_params.yaml" command="load" />
+  		<rosparam file="$(find nox)/cfg/amcl_params.yaml" command="load" />
+
+		<param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+		<param name="controller_frequency" value="5.0" />
+		<param name="controller_patience" value="15.0" />
+
+      		<param name="clearing_rotation_allowed" value="true" /> <!-- Nox is able to rotate in place -->
+     
+	</node>
+	
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find nox)/cfg/rviz_amcl_navigation.rviz" required="true" />
+</launch>
